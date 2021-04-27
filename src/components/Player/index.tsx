@@ -7,21 +7,23 @@ import {convertDurationToTimeString} from "../../utils/convertDurationToTimeStri
 import "rc-slider/assets/index.css";
 import styles from './styles.module.scss';
 
-
 export function Player() {
     //referencia
     const audioRef = useRef<HTMLAudioElement>(null);
     const [progress, setProgress] = useState(0);
+    const [volume, setVolume] = useState(1.0);
 
     const {
         episodeList,
         currentEpisodeIndex,
         isPlaying,
         isLooping,
+        isMute,
         isShuffling,
         togglePlay,
         toggleLoop,
         toggleShuffle,
+        toggleMute,
         playNext,
         playPrevious,
         hasNext,
@@ -41,7 +43,13 @@ export function Player() {
         } else {
             audioRef.current.pause();
         }
-    }, [isPlaying])
+        if(isMute){
+            audioRef.current.muted = true;
+        } else {
+            audioRef.current.muted = false;
+        }
+
+    }, [isPlaying, isMute, setVolume])
 
     function setupProgressListener () {
         audioRef.current.currentTime = 0;
@@ -60,6 +68,16 @@ export function Player() {
             playNext()
         } else {
             clearPlayerState()
+        }
+    }
+
+    function changeVolume (amountVolume: number) {
+        audioRef.current.volume = amountVolume;
+        setVolume(amountVolume);
+        console.log(amountVolume)
+
+        if (amountVolume === 0 || isMute ){
+            toggleMute();
         }
     }
 
@@ -109,6 +127,27 @@ export function Player() {
                         ) }
                     </div>
                     <span> {convertDurationToTimeString(episode?.duration ?? 0 )} </span>
+                </div>
+
+                <div className={styles.volume}>
+                    {  isMute ? <img src="/mute.svg" alt="Tocar" height={16} onClick={toggleMute} /> : <img src="/volume.svg" alt="Tocar" height={16} onClick={toggleMute} /> }
+
+                    <div className={styles.slider}>
+                        { episode ? (
+                            <Slider
+                                min={0.0}
+                                max={1.0}
+                                step={0.01}
+                                value={volume}
+                                onChange={changeVolume}
+                                trackStyle={ { backgroundColor: "#04d361" } }
+                                railStyle={{ backgroundColor: "#9f75ff"  }}
+                                handleStyle={{ borderColor: "#04d361", borderWidth: 4 }}
+                            />
+                        ) : (
+                            <div className={styles.emptySlider} />
+                        ) }
+                    </div>
                 </div>
 
                 {/* Somente if */}
