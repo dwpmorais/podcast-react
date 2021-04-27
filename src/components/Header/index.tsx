@@ -1,6 +1,5 @@
 import format from 'date-fns/format';
 import ptBR from 'date-fns/locale/pt-BR';
-
 import styles from './styles.module.scss';
 
 export function Header() {
@@ -14,5 +13,6 @@ export function Header() {
             <p>O Melhor para você ouvir, sempre</p>
             <span>{currentDate}</span>
         </header>
+
     );
 }
